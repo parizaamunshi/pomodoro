@@ -1,0 +1,86 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+}
+body {
+    height: 400px;
+    width: 300px;
+    background-color: #ffdcbc;
+    padding: 5px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    box-sizing: border-box; 
+}
+#time {
+    font-size: 28px;
+    margin: 20px; 
+}
+.header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 5px;
+    padding: 10px;
+    background-color: #ff6f61;
+    color: white;
+    text-shadow: 0px 2px 5px rgb(126 0 0 / 70%);
+    box-shadow: 0px 2px 5px rgb(0 0 0 / 27%);
+    border-radius: 10px;
+}
+.header-icon {
+    width: 50px; 
+    height: 50px;
+    object-fit: cover;
+}
+.header-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+h2 {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    padding: 0;
+}
+h4 {
+    font-size: 12px;
+    padding: 5px;
+    font-weight: normal;
+    line-height: 1.2;
+}
+.button-container {
+    display: flex;
+    gap: 10px; 
+    margin-bottom: 20px; 
+}
+button {
+    padding: 8px 8px;
+    width: 100px;
+    border: none;
+    border-radius: 5px;
+    background-color: #7dcb69;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center; 
+    transition: background-color 0.3s ease;
+}
+#start-timer-btn{
+    background-color: #7dcb69;
+}
+#reset-timer-btn{
+    background-color: #ff6f61;
+}
+#add-task-btn {
+    margin-top: -5px;
+    background-color: #5bb0fff0;
+}
+#task-container {
+    margin-top: 15px;
+    margin-left: 5px;
+    width: 100%;
+}
