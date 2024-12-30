@@ -1,5 +1,5 @@
-let tasks = []
-
+//TIMER SECTION
+document.addEventListener('DOMContentLoaded', () => {
 function updateTime(){
     chrome.storage.local.get(["timer", "timeOption"], (res) => {
         const time = document.getElementById("time")
@@ -40,57 +40,111 @@ resetTimerBtn.addEventListener("click", () => {
         startTimerBtn.textContent = "Start Timer"
     })
 })
+});
 
-const addTaskBtn=document.getElementById("add-task-btn")
-addTaskBtn.addEventListener("click", () => addTask())
-
-chrome.storage.sync.get(["tasks"], (res) => {
-    tasks = res.tasks ? res.tasks : []
-    renderAll()
-})
-
-function saveTask(){
-    chrome.storage.sync.set({
-        tasks,
-    })
+//TASK SECTION
+document.addEventListener('DOMContentLoaded', () => {
+let tasks = []
+async function fetchTasks() {
+    try {
+        const response = await fetch('http://localhost:3000/tasks', {
+            method: 'GET',
+            headers:{'Content-Type': 'application/json'}
+        });
+        if (!response.ok){
+            throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        tasks = await response.json()
+        renderAll()
+    } 
+    catch (error){
+        console.error('Failed to fetch tasks:', error)
+    }
 }
-function renderTask(taskNum){
-    const taskRow = document.createElement("div")
-    const text = document.createElement("input")
-    text.type = "text"
-    text.placeholder = "Enter a task"
-    text.value = tasks[taskNum] || ""
-    text.addEventListener("change", () => {
-        tasks[taskNum] = text.value
-        saveTask()
-    })
-    const deleteBtn = document.createElement("input")
-    deleteBtn.type = "button"
-    deleteBtn.value = "x"
-    deleteBtn.addEventListener("click", () => {
-        deleteTask(taskNum)
+async function saveTask(task) {
+    try{
+        const response = await fetch('http://localhost:3000/tasks',{
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(task)
+        })
+        if (!response.ok){
+            const errorText = await response.text();
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
+        const newTask = await response.json()
+        tasks.push(newTask)
+        renderAll()
+    }
+    catch (error) {
+        console.error('Failed to save task:', error);
+    }
+}
+async function deleteTask(taskId) {
+    try {
+        const response = await fetch(`http://localhost:3000/tasks/${taskId}`,{
+            method:'DELETE'
+        })
+        if (!response.ok){
+            const errorText = await response.text()
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`)
+        }
+        tasks = tasks.filter(task => task._id !== taskId)
+        renderAll()
+    } 
+    catch (error) {
+        console.error('Failed to delete task:', error)
+    }
+}
+function renderTask(task) {
+    const taskRow = document.createElement('div');
+    const text = document.createElement('input');
+    text.type = 'text';
+    text.placeholder = 'Enter a task';
+    text.value = task.text;
+    text.addEventListener('change', async() => {
+        task.text = text.value;
+        try {
+            const response = await fetch(`http://localhost:3000/tasks/${task._id}`,{
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(task)
+            })
+            if (!response.ok) {
+                const errorText = await response.text()
+                throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`)
+            }
+        } 
+        catch (error) {
+            console.error('Failed to update task:', error)
+        }
+    });
+    const deleteBtn = document.createElement('input')
+    deleteBtn.type = 'button'
+    deleteBtn.value = 'x'
+    deleteBtn.addEventListener('click', () => {
+        deleteTask(task._id);
     })
     taskRow.appendChild(text)
     taskRow.appendChild(deleteBtn)
-
-    const taskContainer = document.getElementById("task-container")
+  
+    const taskContainer = document.getElementById('task-container')
     taskContainer.appendChild(taskRow)
 }
-function addTask(){
-    const taskNum = tasks.length
-    tasks.push("")
-    renderTask(taskNum)
-    saveTask()
-}
-function deleteTask(taskNum){
-    tasks.splice(taskNum, 1)
-    renderAll()
-    saveTask()
-}
+function addTask() {
+    const newTask = {text:''}
+    saveTask(newTask)
+  }
 function renderAll(){
     const taskContainer = document.getElementById("task-container")
     taskContainer.textContent = ""
-    tasks.forEach((taskText, taskNum) => {
-        renderTask(taskNum)
+    tasks.forEach(task => {
+        renderTask(task)
     })
 }
+const addTaskBtn = document.getElementById('add-task-btn');
+if (addTaskBtn){
+    addTaskBtn.addEventListener('click', addTask)
+}
+fetchTasks()
+})
