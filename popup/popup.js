@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
 let tasks = []
 async function fetchTasks() {
     try {
-        const response = await fetch('http://localhost:3000/tasks', {
+        const response = await fetch('https://pomodoro-7anm61hf4-parizaas-projects.vercel.app', {
             method: 'GET',
             headers:{'Content-Type': 'application/json'}
         });
@@ -63,7 +63,7 @@ async function fetchTasks() {
 }
 async function saveTask(task) {
     try{
-        const response = await fetch('http://localhost:3000/tasks',{
+        const response = await fetch('https://pomodoro-7anm61hf4-parizaas-projects.vercel.app',{
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(task)
@@ -82,7 +82,7 @@ async function saveTask(task) {
 }
 async function deleteTask(taskId) {
     try {
-        const response = await fetch(`http://localhost:3000/tasks/${taskId}`,{
+        const response = await fetch(`https://pomodoro-7anm61hf4-parizaas-projects.vercel.app/${taskId}`,{
             method:'DELETE'
         })
         if (!response.ok){
@@ -105,7 +105,7 @@ function renderTask(task) {
     text.addEventListener('change', async() => {
         task.text = text.value;
         try {
-            const response = await fetch(`http://localhost:3000/tasks/${task._id}`,{
+            const response = await fetch(`https://pomodoro-7anm61hf4-parizaas-projects.vercel.app/${task._id}`,{
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(task)
