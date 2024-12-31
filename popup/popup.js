@@ -1,3 +1,5 @@
+const BASE_URL = 'https://pomodoro-7anm61hf4-parizaas-projects.vercel.app'
+
 //TIMER SECTION
 document.addEventListener('DOMContentLoaded', () => {
 function updateTime(){
@@ -25,7 +27,7 @@ startTimerBtn.addEventListener("click", () => {
             if (!res.isRunning) {
                 startTimerBtn.style.backgroundColor = "#ff6f61"
             } else {
-                startTimerBtn.style.backgroundColor = "#4CAF50";
+                startTimerBtn.style.backgroundColor = "#4CAF50"
             }
         })
     })
@@ -40,51 +42,49 @@ resetTimerBtn.addEventListener("click", () => {
         startTimerBtn.textContent = "Start Timer"
     })
 })
-});
+})
 
 //TASK SECTION
 document.addEventListener('DOMContentLoaded', () => {
 let tasks = []
 async function fetchTasks() {
-    try {
-        const response = await fetch('https://pomodoro-7anm61hf4-parizaas-projects.vercel.app', {
+    try{
+        const response = await fetch('${BASE_URL}', {
             method: 'GET',
             headers:{'Content-Type': 'application/json'}
-        });
+        })
         if (!response.ok){
             throw new Error(`HTTP error! status: ${response.status}`)
         }
         tasks = await response.json()
-        renderAll()
+        renderAll();
     } 
     catch (error){
-        console.error('Failed to fetch tasks:', error)
+        console.error('Failed to fetch tasks:', error);
     }
 }
 async function saveTask(task) {
     try{
-        const response = await fetch('https://pomodoro-7anm61hf4-parizaas-projects.vercel.app',{
+        const response = await fetch('${BASE_URL}',{
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(task)
         })
         if (!response.ok){
-            const errorText = await response.text();
-            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+            const errorText = await response.text()
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`)
         }
         const newTask = await response.json()
         tasks.push(newTask)
         renderAll()
     }
     catch (error) {
-        console.error('Failed to save task:', error);
+        console.error('Failed to save task:', error)
     }
 }
 async function deleteTask(taskId) {
     try {
-        const response = await fetch(`https://pomodoro-7anm61hf4-parizaas-projects.vercel.app/${taskId}`,{
-            method:'DELETE'
-        })
+        const response = await fetch(`${BASE_URL}/${taskId}`, { method: 'DELETE' })
         if (!response.ok){
             const errorText = await response.text()
             throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`)
@@ -97,15 +97,15 @@ async function deleteTask(taskId) {
     }
 }
 function renderTask(task) {
-    const taskRow = document.createElement('div');
-    const text = document.createElement('input');
-    text.type = 'text';
-    text.placeholder = 'Enter a task';
-    text.value = task.text;
+    const taskRow = document.createElement('div')
+    const text = document.createElement('input')
+    text.type = 'text'
+    text.placeholder = 'Enter a task'
+    text.value = task.text
     text.addEventListener('change', async() => {
-        task.text = text.value;
+        task.text = text.value
         try {
-            const response = await fetch(`https://pomodoro-7anm61hf4-parizaas-projects.vercel.app/${task._id}`,{
+            const response = await fetch(`${BASE_URL}/${task._id}`,{
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(task)
@@ -118,12 +118,12 @@ function renderTask(task) {
         catch (error) {
             console.error('Failed to update task:', error)
         }
-    });
+    })
     const deleteBtn = document.createElement('input')
     deleteBtn.type = 'button'
     deleteBtn.value = 'x'
     deleteBtn.addEventListener('click', () => {
-        deleteTask(task._id);
+        deleteTask(task._id)
     })
     taskRow.appendChild(text)
     taskRow.appendChild(deleteBtn)
@@ -135,14 +135,18 @@ function addTask() {
     const newTask = {text:''}
     saveTask(newTask)
   }
-function renderAll(){
-    const taskContainer = document.getElementById("task-container")
-    taskContainer.textContent = ""
-    tasks.forEach(task => {
-        renderTask(task)
-    })
+function addTask() {
+    const taskInput = document.getElementById('task-input')
+    const text = taskInput.value.trim()
+    if (text){
+        saveTask({text})
+        taskInput.value = '' 
+    } 
+    else{
+        alert('Task cannot be empty!')
+    }
 }
-const addTaskBtn = document.getElementById('add-task-btn');
+const addTaskBtn = document.getElementById('add-task-btn')
 if (addTaskBtn){
     addTaskBtn.addEventListener('click', addTask)
 }

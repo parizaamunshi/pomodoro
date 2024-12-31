@@ -4,11 +4,8 @@ const cors = require('cors')
 const app = express()
 const port = 3000
 
-const corsOptions = {
-    origin: 'chrome-extension://boiojlmgapgofbcgomjamnpdengbiolj',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-}
-app.use(cors(corsOptions))
+const cors = require('cors')
+app.use(cors({ origin: '*' }))
 app.use(express.json())
 
 const url = 'https://pomodoro-7anm61hf4-parizaas-projects.vercel.app'
