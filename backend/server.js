@@ -1,74 +1,52 @@
-const express = require('express')
-const { MongoClient, ObjectId } = require('mongodb')
-const cors = require('cors')
-const app = express()
-const port = 3000
+const express = require("express");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const app = express();
 
-const cors = require('cors')
-app.use(cors({ origin: '*' }))
-app.use(express.json())
+app.use(cors());
+app.use(bodyParser.json());
 
-const url = 'https://pomodoro-7anm61hf4-parizaas-projects.vercel.app'
-const dbName = 'pomodoro'
-let db;
+mongoose.connect("mongodb://localhost:27017/pomodoro", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+}).then(() => {
+    console.log("Connected to MongoDB");
+}).catch((err) => {
+    console.error("Error connecting to MongoDB:", err);
+});
+const taskSchema = new mongoose.Schema({
+    text: String,
+});
 
-MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (err, client) => {
-    if (err){
-        console.error('Failed to connect to the database:', err)
-        throw err
+const Task = mongoose.model("Task", taskSchema);
+app.get("/tasks", async (req, res) => {
+    try {
+        const tasks = await Task.find();
+        res.json(tasks);
+    } catch (err) {
+        res.status(500).send(err.message);
     }
-    db = client.db(dbName)
-    console.log(`Connected to database: ${dbName}`)
-})
-
-app.get('/tasks', async (req, res) => {
-    try{
-        const tasks = await db.collection('tasks').find().toArray()
-        res.json(tasks)
-    } 
-    catch (err){
-        console.error('Failed to fetch tasks:', err)
-        res.status(500).send('Error fetching tasks')
+});
+app.post("/tasks", async (req, res) => {
+    try {
+        const newTask = new Task({ text: req.body.text });
+        await newTask.save();
+        res.json(newTask);
+    } catch (err) {
+        res.status(500).send(err.message);
     }
-})
-
-app.post('/tasks', async (req, res) => {
-    try{
-        const newTask = req.body
-        const result = await db.collection('tasks').insertOne(newTask)
-        res.json(result.ops[0])
-    } 
-    catch (err){
-        console.error('Failed to add task:', err)
-        res.status(500).send('Error adding task')
+});
+app.delete("/tasks/:id", async (req, res) => {
+    try {
+        const task = await Task.findByIdAndDelete(req.params.id);
+        if (!task) return res.status(404).send("Task not found");
+        res.json(task);
+    } catch (err) {
+        res.status(500).send(err.message);
     }
-})
-
-app.put('/tasks/:id', async (req, res) => {
-    try{
-        const id = req.params.id
-        const updatedTask = req.body
-        await db.collection('tasks').updateOne({ _id: new ObjectId(id) }, { $set: updatedTask })
-        res.send('Task updated')
-    } 
-    catch (err){
-        console.error('Failed to update task:', err)
-        res.status(500).send('Error updating task')
-    }
-})
-
-app.delete('/tasks/:id', async (req, res) => {
-    try{
-        const id = req.params.id
-        await db.collection('tasks').deleteOne({ _id: new ObjectId(id) })
-        res.json({ message: 'Task deleted' })
-    } 
-    catch (err){
-        console.error('Failed to delete task:', err)
-        res.status(500).send('Error deleting task')
-    }
-})
-
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`)
-})
+});
+const PORT = 5000;
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+});

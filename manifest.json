@@ -8,10 +8,10 @@
         "48" : "icon.png",
         "128" : "icon.png"
     },
-    "permissions": ["storage", "alarms", "notifications", "http://*/*", "https://*/*",],
+    "permissions": ["storage", "alarms", "notifications"],
     "host_permissions": ["http://localhost:3000/"],
     "content_security_policy": {
-        "extension_pages": "script-src 'self'; object-src 'self'"
+        "extension_pages": "script-src 'self'; object-src 'self'; connect-src http://localhost:5000"
     },
     "action" : {
         "default_popup" : "popup/popup.html",

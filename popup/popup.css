@@ -1,6 +1,6 @@
-*{
-    margin:0;
-    padding:0;
+* {
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 body {
@@ -58,29 +58,70 @@ h4 {
     margin-bottom: 20px; 
 }
 button {
-    padding: 8px 8px;
-    width: 100px;
+    padding: 8px 16px;
     border: none;
     border-radius: 5px;
-    background-color: #7dcb69;
     color: white;
     font-size: 14px;
     cursor: pointer;
-    text-align: center; 
+    text-align: center;
     transition: background-color 0.3s ease;
+    outline: none;
 }
-#start-timer-btn{
+#start-timer-btn {
     background-color: #7dcb69;
 }
-#reset-timer-btn{
+#start-timer-btn:hover {
+    background-color: #6fae5b; 
+}
+#reset-timer-btn {
     background-color: #ff6f61;
 }
-#add-task-btn {
-    margin-top: -5px;
-    background-color: #5bb0fff0;
+#reset-timer-btn:hover {
+    background-color: #e94f40; 
 }
-#task-container {
-    margin-top: 15px;
-    margin-left: 5px;
-    width: 100%;
+#add-task-btn {
+    background-color: #5bb0fff0;
+    margin-top: -5px;
+    margin-bottom: 10px;
+}
+#add-task-btn:hover {
+    background-color: #4da8e5; 
+}
+.task-container {
+    display: flex;
+    gap: 10px;
+    margin: 10px;
+}
+.input[type="text"] {
+    flex: 1;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+.task-container input[type="text"]:focus {
+    border-color: #7dcb69;
+}
+.save-btn, .delete-btn {
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.save-btn {
+    background-color: #7dcb69;
+    color: white;
+}
+.save-btn:hover {
+    background-color: #6fae5b;
+}
+.delete-btn {
+    background-color: #ff6f61;
+    color: white;
+}
+.delete-btn:hover {
+    background-color: #e55c4a;
 }
