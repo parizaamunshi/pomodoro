@@ -209,3 +209,109 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     fetchTasks();
 });
+
+//SPOTIFY
+require('dotenv').config();
+const express = require('express');
+const axios = require('axios');
+const open = require('open');
+
+const app = express();
+const port = 3000;
+
+// Spotify API credentials from .env file
+const clientId = process.env.SPOTIFY_CLIENT_ID; // Your Spotify Client ID
+const clientSecret = process.env.SPOTIFY_CLIENT_SECRET; // Your Spotify Client Secret
+const redirectUri = 'http://localhost:3000/callback'; // Redirect URI
+
+let accessToken = ''; // Will hold the Spotify access token
+
+// Step 1: Log in to Spotify
+app.get('/login', (req, res) => {
+  const scopes = 'user-modify-playback-state user-read-playback-state';
+  const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${encodeURIComponent(
+    scopes
+  )}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+  res.redirect(authUrl);
+});
+
+// Step 2: Spotify Callback for Access Token
+app.get('/callback', async (req, res) => {
+  const code = req.query.code;
+
+  try {
+    const response = await axios.post('https://accounts.spotify.com/api/token', null, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: Basic ${Buffer.from(${clientId}:${clientSecret}).toString('base64')},
+      },
+      params: {
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: redirectUri,
+      },
+    });
+
+    accessToken = response.data.access_token;
+    res.send('Spotify authentication successful! You can now control playback.');
+  } catch (error) {
+    console.error('Error authenticating with Spotify:', error.response?.data || error.message);
+    res.status(500).send('Authentication failed. Please try again.');
+  }
+});
+
+// Step 3: Play Music
+app.get('/play', async (req, res) => {
+  if (!accessToken) {
+    return res.redirect('/login');
+  }
+
+  try {
+    await axios.put(
+      'https://api.spotify.com/v1/me/player/play',
+      {
+        uris: ['spotify:track:1cKHdTo9u0ZymJdPGSh6nq'], // Replace with your desired track URI
+      },
+      {
+        headers: {
+          Authorization: Bearer ${accessToken},
+        },
+      }
+    );
+
+    res.send('Music is playing on Spotify!');
+  } catch (error) {
+    console.error('Error playing music:', error.response?.data || error.message);
+    res.status(500).send('Failed to play music. Ensure you have an active playback device.');
+  }
+});
+
+// Step 4: Pause Music
+app.get('/pause', async (req, res) => {
+  if (!accessToken) {
+    return res.redirect('/login');
+  }
+
+  try {
+    await axios.put(
+      'https://api.spotify.com/v1/me/player/pause',
+      null,
+      {
+        headers: {
+          Authorization: Bearer ${accessToken},
+        },
+      }
+    );
+
+    res.send('Music is paused on Spotify!');
+  } catch (error) {
+    console.error('Error pausing music:', error.response?.data || error.message);
+    res.status(500).send('Failed to pause music.');
+  }
+});
+
+// Start the server
+app.listen(port, () => {
+  console.log(Server running at http://localhost:${port});
+  open(http://localhost:${port}/login); // Automatically open login URL
+});
